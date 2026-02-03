@@ -19,14 +19,16 @@ export default function Home() {
   }, []);
 
   const login = async () => {
-  try {
-    await signInWithPopup(auth, googleProvider);
-  } catch (error: any) { // Add ': any' here to solve the Type error
-    if (error.code !== "auth/cancelled-popup-request") {
-      console.error("Login Error:", error);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      // Cast the error to 'any' inside the block to bypass the check
+      const error = err as any;
+      if (error.code !== "auth/cancelled-popup-request") {
+        console.error("Login failed:", error);
+      }
     }
-  }
-};
+  };
 
   const getEmbedUrl = (url: string) => {
     if (!url) return null;
