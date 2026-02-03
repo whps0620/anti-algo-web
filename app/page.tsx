@@ -21,13 +21,12 @@ export default function Home() {
   const login = async () => {
   try {
     await signInWithPopup(auth, googleProvider);
-  } catch (error) {
-    if (error.code !== 'auth/cancelled-popup-request') {
-      console.error(error);
+  } catch (error: any) { // Add ': any' here to solve the Type error
+    if (error.code !== "auth/cancelled-popup-request") {
+      console.error("Login Error:", error);
     }
   }
-
-  };
+};
 
   const getEmbedUrl = (url: string) => {
     if (!url) return null;
