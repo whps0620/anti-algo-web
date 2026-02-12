@@ -83,14 +83,12 @@ export default function Home() {
       <section className="mb-12 max-w-2xl text-center border-y-2 border-black py-10 px-6 bg-white">
         <div className="text-sm leading-relaxed space-y-4">
           <p>
-            We’re tired of 'For You' pages that feel like they're for a robot. Algorithms create echo chambers, 
-            locking us in a loop of the familiar. <strong>Anti-Algo</strong> aims for no tracking, no data points, 
-            and no shortcuts.
+            Algorithms create echo chambers, locking us in a loop of the familiar.
+            <strong>Anti-Algo</strong> aims for no tracking, no data points, and no shortcuts.
           </p>
           <p>
             Just songs dropped into the ocean by real people, waiting for you to find them. 
             We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine. 
-            <span className="block mt-4 font-bold uppercase tracking-widest text-xs">Discovery is better when it’s human.</span>
           </p>
         </div>
       </section>
