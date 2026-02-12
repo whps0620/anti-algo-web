@@ -116,7 +116,7 @@ export default function Home() {
             
             {/* DROP SECTION */}
             <section className="border-2 border-black p-6 flex flex-col gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
-              <h2 className="text-2xl font-black border-b-2 border-black pb-2 uppercase">Drop a Song</h2>
+              <h2 className="text-2xl font-black border-b-2 border-black pb-2 uppercase text-center">Drop a Song</h2>
               <input 
                 className="p-3 border-2 border-black outline-none focus:ring-2 focus:ring-gray-200"
                 placeholder="Paste Spotify/YouTube URL"
