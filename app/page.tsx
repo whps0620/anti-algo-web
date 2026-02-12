@@ -52,7 +52,7 @@ export default function Home() {
     }
   };
 
-  // 5. Logic: Convert URL to Embed Format (The "Screenshot" Preview)
+  // 5. Logic: Convert URL to Embed Format (The "Screenshot" Mode)
   const getEmbedUrl = (url: string) => {
     if (url.includes("spotify.com")) {
       if (url.includes("/track/")) {
@@ -73,22 +73,26 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-black p-4 md:p-8 flex flex-col items-center font-mono">
       
-      {/* HEADER SECTION - ALWAYS VISIBLE */}
+      {/* HEADER SECTION */}
       <header className="text-center mb-8 mt-6">
         <h1 className="text-4xl md:text-6xl font-black tracking-tighter italic">ANTI-ALGO</h1>
         {hasEntered && <p className="mt-2 text-sm opacity-70 uppercase tracking-widest text-center">Guest: {username}</p>}
       </header>
 
-      {/* PHILOSOPHY BLOCK - ALWAYS VISIBLE ABOVE INTERACTION */}
+      {/* REVISED PHILOSOPHY BLOCK - ALWAYS VISIBLE */}
+
       <section className="mb-12 max-w-2xl text-center border-y-2 border-black py-10 px-6 bg-white">
+        {/* <h3 className="text-xl font-black uppercase mb-6 tracking-tighter">The Human Ocean</h3> */}
         <div className="text-sm leading-relaxed space-y-4">
           <p>
-            Algorithms create echo chambers, locking us in a loop of the familiar.
-            <strong>Anti-Algo</strong> aims for no tracking, no data points, and no shortcuts.
+            Algorithms create echo chambers, locking us in a loop of the familiar. 
+          </p>
+          <p>
+            <strong>Anti-Algo</strong> aims for no tracking, no data points, no shortcuts.
           </p>
           <p>
             Just songs dropped into the ocean by real people, waiting for you to find them. 
-            We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine. 
+            We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine :)
           </p>
         </div>
       </section>
@@ -137,7 +141,7 @@ export default function Home() {
               </button>
             </section>
 
-            {/* RECEIVE SECTION */}
+            {/* RECEIVE SECTION (With Iframe Preview) */}
             <section className="border-2 border-black p-6 flex flex-col gap-4 bg-gray-50 min-h-[450px] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <h2 className="text-2xl font-black border-b-2 border-black pb-2 uppercase text-center">Hear a Stranger</h2>
               
@@ -155,7 +159,7 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  {/* SONG PREVIEW (SCREENSHOT) */}
+                  {/* SONG PREVIEW (IFRAME) */}
                   <div className="mb-4 border-2 border-black overflow-hidden bg-white">
                     <iframe 
                       src={getEmbedUrl(discoveredSong.url)} 
