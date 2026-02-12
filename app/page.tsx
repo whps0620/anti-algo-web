@@ -35,7 +35,7 @@ export default function Home() {
     } catch (error) { console.error(error); }
   };
 
-  // 4. Logic: Receive a Random Song
+  // 4. Logic: ORIGINAL WORKING Receive Function
   const receiveSong = async () => {
     const rand = Math.random();
     const q = query(
@@ -52,7 +52,7 @@ export default function Home() {
     }
   };
 
-  // 5. Logic: Convert URL to Embed Format (The "Screenshot" Mode)
+  // 5. Logic: Convert URL to Embed Format
   const getEmbedUrl = (url: string) => {
     if (url.includes("spotify.com")) {
       if (url.includes("/track/")) {
@@ -79,20 +79,18 @@ export default function Home() {
         {hasEntered && <p className="mt-2 text-sm opacity-70 uppercase tracking-widest text-center">Guest: {username}</p>}
       </header>
 
-      {/* REVISED PHILOSOPHY BLOCK - ALWAYS VISIBLE */}
-
+      {/* PHILOSOPHY BLOCK - ALWAYS VISIBLE */}
       <section className="mb-12 max-w-2xl text-center border-y-2 border-black py-10 px-6 bg-white">
-        {/* <h3 className="text-xl font-black uppercase mb-6 tracking-tighter">The Human Ocean</h3> */}
         <div className="text-sm leading-relaxed space-y-4">
           <p>
-            Algorithms create echo chambers, locking us in a loop of the familiar. 
-          </p>
-          <p>
-            <strong>Anti-Algo</strong> aims for no tracking, no data points, no shortcuts.
+            We’re tired of 'For You' pages that feel like they're for a robot. Algorithms create echo chambers, 
+            locking us in a loop of the familiar. <strong>Anti-Algo</strong> aims for no tracking, no data points, 
+            and no shortcuts.
           </p>
           <p>
             Just songs dropped into the ocean by real people, waiting for you to find them. 
-            We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine :)
+            We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine. 
+            <span className="block mt-4 font-bold uppercase tracking-widest text-xs text-center">Discovery is better when it’s human.</span>
           </p>
         </div>
       </section>
@@ -141,7 +139,7 @@ export default function Home() {
               </button>
             </section>
 
-            {/* RECEIVE SECTION (With Iframe Preview) */}
+            {/* RECEIVE SECTION - REVERTED TO ORIGINAL WORKING UI */}
             <section className="border-2 border-black p-6 flex flex-col gap-4 bg-gray-50 min-h-[450px] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <h2 className="text-2xl font-black border-b-2 border-black pb-2 uppercase text-center">Hear a Stranger</h2>
               
@@ -159,14 +157,14 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  {/* SONG PREVIEW (IFRAME) */}
+                  {/* SONG PREVIEW IFRAME */}
                   <div className="mb-4 border-2 border-black overflow-hidden bg-white">
                     <iframe 
                       src={getEmbedUrl(discoveredSong.url)} 
                       width="100%" 
                       height="152" 
                       frameBorder="0" 
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                      allow="autoplay; encrypted-media; fullscreen" 
                       loading="lazy"
                     ></iframe>
                   </div>
