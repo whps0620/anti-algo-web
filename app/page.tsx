@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react"; 
+import { useState } from "react"; 
 import { db } from "@/lib/firebase"; 
 import { collection, addDoc, getDocs, query, where, limit, serverTimestamp } from "firebase/firestore";
 
@@ -55,8 +55,10 @@ export default function Home() {
   // 5. Logic: Convert URL to Embed Format (The "Screenshot" Preview)
   const getEmbedUrl = (url: string) => {
     if (url.includes("spotify.com")) {
-      // Handles both open.spotify.com and embedded links
-      return url.replace("open.spotify.com", "open.spotify.com/embed");
+      if (url.includes("/track/")) {
+        return url.replace("/track/", "/embed/track/");
+      }
+      return url;
     }
     if (url.includes("youtube.com/watch?v=")) {
       return url.replace("watch?v=", "embed/");
@@ -67,31 +69,36 @@ export default function Home() {
     return url;
   };
 
-  // 6. Logic: 15-Second Timer (Washes song back to the ocean)
-  useEffect(() => {
-    if (discoveredSong) {
-      const timer = setTimeout(() => {
-        setDiscoveredSong(null);
-        // Optional: alert("The song has returned to the depths.");
-      }, 15000); 
-      return () => clearTimeout(timer);
-    }
-  }, [discoveredSong]);
-
-  // 7. UI Render
+  // 6. UI Render
   return (
     <main className="min-h-screen bg-white text-black p-4 md:p-8 flex flex-col items-center font-mono">
       
-      {/* HEADER SECTION */}
+      {/* HEADER SECTION - ALWAYS VISIBLE */}
       <header className="text-center mb-8 mt-6">
         <h1 className="text-4xl md:text-6xl font-black tracking-tighter italic">ANTI-ALGO</h1>
-        {hasEntered && <p className="mt-2 text-sm opacity-70 uppercase tracking-widest">Guest: {username}</p>}
+        {hasEntered && <p className="mt-2 text-sm opacity-70 uppercase tracking-widest text-center">Guest: {username}</p>}
       </header>
+
+      {/* PHILOSOPHY BLOCK - ALWAYS VISIBLE ABOVE INTERACTION */}
+      <section className="mb-12 max-w-2xl text-center border-y-2 border-black py-10 px-6 bg-white">
+        <div className="text-sm leading-relaxed space-y-4">
+          <p>
+            We’re tired of 'For You' pages that feel like they're for a robot. Algorithms create echo chambers, 
+            locking us in a loop of the familiar. <strong>Anti-Algo</strong> aims for no tracking, no data points, 
+            and no shortcuts.
+          </p>
+          <p>
+            Just songs dropped into the ocean by real people, waiting for you to find them. 
+            We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine. 
+            <span className="block mt-4 font-bold uppercase tracking-widest text-xs">Discovery is better when it’s human.</span>
+          </p>
+        </div>
+      </section>
 
       {!hasEntered ? (
         /* LOGIN VIEW */
-        <form onSubmit={enterOcean} className="flex flex-col gap-6 items-center justify-center min-h-[40vh]">
-          <p className="text-center max-w-xs text-sm">Enter the ocean anonymously. Your discovery is powered by humans, not data.</p>
+        <form onSubmit={enterOcean} className="flex flex-col gap-6 items-center justify-center py-10">
+          <p className="text-center max-w-xs text-sm">Pick a nickname to start exploring the ocean.</p>
           <input 
             type="text" 
             placeholder="Choose a nickname..."
@@ -106,26 +113,7 @@ export default function Home() {
         </form>
       ) : (
         /* MAIN APP VIEW */
-        <div className="w-full max-w-6xl flex flex-col items-center">
-          
-          {/* PHILOSOPHY BLOCK */}
-          <section className="mb-12 max-w-2xl text-center border-y-2 border-black py-8 px-4">
-            <h3 className="text-xl font-black uppercase mb-4 tracking-tighter text-center">The Human Ocean</h3>
-            <div className="text-sm leading-relaxed space-y-4">
-              <p>
-                We’re tired of 'For You' pages that feel like they're for a robot. Algorithms create echo chambers, 
-                locking us in a loop of the familiar. <strong>Anti-Algo</strong> aims for no tracking, no data points, 
-                and no shortcuts.
-              </p>
-              <p>
-                Just songs dropped into the ocean by real people, waiting for you to find them. 
-                We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine. 
-                <span className="block mt-4 font-bold uppercase tracking-widest text-xs">Discovery is better when it’s human.</span>
-              </p>
-            </div>
-          </section>
-
-          {/* INTERACTION GRID */}
+        <div className="w-full max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full">
             
             {/* DROP SECTION */}
@@ -197,7 +185,6 @@ export default function Home() {
                 </div>
               )}
             </section>
-
           </div>
         </div>
       )}
