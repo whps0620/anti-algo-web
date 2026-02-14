@@ -4,20 +4,18 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, getDocs, query, where, limit, serverTimestamp } from "firebase/firestore";
 
 export default function Home() {
-  // 1. App State
   const [username, setUsername] = useState("");
   const [hasEntered, setHasEntered] = useState(false);
   const [songUrl, setSongUrl] = useState("");
   const [reason, setReason] = useState("");
   const [discoveredSong, setDiscoveredSong] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  // 2. Logic: Enter the App
   const enterOcean = (e: React.FormEvent) => {
     e.preventDefault();
     if (username.trim()) setHasEntered(true);
   };
 
-  // 3. Logic: Drop a Song into Firestore
   const dropSong = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!songUrl) return;
@@ -31,157 +29,150 @@ export default function Home() {
       });
       setSongUrl("");
       setReason("");
-      alert("Song dropped into the ocean.");
+      alert("Success: Your song is now drifting in the ocean.");
     } catch (error) { console.error(error); }
   };
 
-  // 4. Logic: ORIGINAL WORKING Receive Function
   const receiveSong = async () => {
+    setLoading(true);
     const rand = Math.random();
-    const q = query(
-      collection(db, "recommendations"),
-      where("randomId", ">=", rand),
-      limit(1)
-    );
+    const q = query(collection(db, "recommendations"), where("randomId", ">=", rand), limit(1));
     const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      setDiscoveredSong(querySnapshot.docs[0].data());
-    } else {
-      const fallback = await getDocs(query(collection(db, "recommendations"), limit(1)));
-      if (!fallback.empty) setDiscoveredSong(fallback.docs[0].data());
-    }
+    
+    setTimeout(async () => {
+      if (!querySnapshot.empty) {
+        setDiscoveredSong(querySnapshot.docs[0].data());
+      } else {
+        const fallback = await getDocs(query(collection(db, "recommendations"), limit(1)));
+        if (!fallback.empty) setDiscoveredSong(fallback.docs[0].data());
+      }
+      setLoading(false);
+    }, 500);
   };
 
-  // 5. Logic: Convert URL to Embed Format
   const getEmbedUrl = (url: string) => {
-    if (url.includes("spotify.com")) {
-      if (url.includes("/track/")) {
-        return url.replace("/track/", "/embed/track/");
-      }
-      return url;
-    }
-    if (url.includes("youtube.com/watch?v=")) {
-      return url.replace("watch?v=", "embed/");
-    }
-    if (url.includes("youtu.be/")) {
-      return url.replace("youtu.be/", "youtube.com/embed/");
-    }
+    if (!url) return "";
+    let videoId = "";
+    if (url.includes("v=")) videoId = url.split("v=")[1]?.split("&")[0];
+    else if (url.includes("youtu.be/")) videoId = url.split("youtu.be/")[1]?.split("?")[0];
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
     return url;
   };
 
-  // 6. UI Render
   return (
-    <main className="min-h-screen bg-white text-black p-4 md:p-8 flex flex-col items-center font-mono">
+    <main className="min-h-screen bg-[#f0fdf4] text-black p-4 md:p-8 font-mono selection:bg-[#bef264]">
       
       {/* HEADER SECTION */}
-      <header className="text-center mb-8 mt-6">
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter italic">ANTI-ALGO</h1>
-        {hasEntered && <p className="mt-2 text-sm opacity-70 uppercase tracking-widest text-center">Guest: {username}</p>}
+      <header className="w-full flex flex-col items-center mb-12 py-10">
+        <h1 className="text-5xl md:text-7xl font-black tracking-tighter italic bg-[#bef264] px-10 py-4 border-4 border-black rounded-[40px] shadow-[0px_8px_0px_0px_rgba(0,0,0,1)]">
+          ANTI-ALGO
+        </h1>
       </header>
 
-      {/* PHILOSOPHY BLOCK - ALWAYS VISIBLE */}
-      <section className="mb-12 max-w-2xl text-center border-y-2 border-black py-10 px-6 bg-white">
-        <div className="text-sm leading-relaxed space-y-4">
-          <p>
-            We’re tired of 'For You' pages that feel like they're for a robot. Algorithms create echo chambers, 
-            locking us in a loop of the familiar. <strong>Anti-Algo</strong> aims for no tracking, no data points, 
-            and no shortcuts.
-          </p>
-          <p>
-            Just songs dropped into the ocean by real people, waiting for you to find them. 
-            We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine. 
-            <span className="block mt-4 font-bold uppercase tracking-widest text-xs text-center">Discovery is better when it’s human.</span>
-          </p>
-        </div>
-      </section>
-
       {!hasEntered ? (
-        /* LOGIN VIEW */
-        <form onSubmit={enterOcean} className="flex flex-col gap-6 items-center justify-center py-10">
-          <p className="text-center max-w-xs text-sm">Pick a nickname to start exploring the ocean.</p>
-          <input 
-            type="text" 
-            placeholder="Choose a nickname..."
-            className="p-4 border-2 border-black rounded-none text-center font-bold w-64 outline-none focus:bg-black focus:text-white transition-all"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <button className="px-10 py-4 border-2 border-black font-black hover:bg-black hover:text-white transition-all uppercase">
-            Enter the Ocean
-          </button>
-        </form>
+        <div className="max-w-2xl mx-auto space-y-12">
+          {/* PHILOSOPHY BLOCK */}
+          <section className="bg-white border-4 border-black p-8 rounded-[30px] shadow-[0px_6px_0px_0px_rgba(0,0,0,1)] text-center">
+            <div className="text-md md:text-lg leading-relaxed space-y-4 font-medium italic">
+              <p>Algorithms create echo chambers, locking us in a loop of the familiar. Anti-Algo aims for no tracking, no data points, and no shortcuts.</p>
+              <p>Just songs dropped into the ocean by real people, waiting for you to find them. We think it’s cool that music is discovered through the ears of a stranger, not the logic of a machine.</p>
+            </div>
+          </section>
+
+          {/* LOGIN VIEW */}
+          <form onSubmit={enterOcean} className="flex flex-col gap-6 items-center justify-center p-12 bg-[#fefce8] border-4 border-black rounded-[40px] shadow-[0px_10px_0px_0px_rgba(0,0,0,1)]">
+            <p className="font-black text-xl uppercase italic">Pick a nickname to start</p>
+            <input 
+              type="text" 
+              placeholder="Username..."
+              className="p-5 border-4 border-black rounded-full text-center font-bold w-full max-w-xs outline-none focus:bg-white"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <button className="px-12 py-5 bg-[#bef264] border-4 border-black rounded-full font-black hover:bg-black hover:text-[#bef264] transition-all uppercase shadow-[0px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none">
+              Enter the Ocean
+            </button>
+          </form>
+        </div>
       ) : (
         /* MAIN APP VIEW */
-        <div className="w-full max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full">
+        <div className="w-full max-w-6xl mx-auto animate-in fade-in duration-500">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             {/* DROP SECTION */}
-            <section className="border-2 border-black p-6 flex flex-col gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
-              <h2 className="text-2xl font-black border-b-2 border-black pb-2 uppercase text-center">Drop a Song</h2>
-              <input 
-                className="p-3 border-2 border-black outline-none focus:ring-2 focus:ring-gray-200"
-                placeholder="Paste Spotify/YouTube URL"
-                value={songUrl}
-                onChange={(e) => setSongUrl(e.target.value)}
-              />
-              <textarea 
-                className="p-3 border-2 border-black h-24 outline-none focus:ring-2 focus:ring-gray-200"
-                placeholder="Why should a stranger hear this?"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-              />
-              <button 
-                onClick={dropSong} 
-                className="bg-black text-white p-4 font-black uppercase hover:bg-white hover:text-black border-2 border-black transition-all"
-              >
-                Give to the Ocean
-              </button>
+            <section className="border-4 border-black p-8 flex flex-col gap-6 bg-white rounded-[40px] shadow-[0px_10px_0px_0px_rgba(190,242,100,1)]">
+              <h2 className="text-3xl font-black border-b-4 border-black pb-2 uppercase italic mb-2">Drop a Bottle</h2>
+              <div className="space-y-4 flex flex-col flex-1">
+                <input 
+                  className="w-full p-4 border-4 border-black bg-[#fefce8] rounded-2xl font-bold outline-none"
+                  placeholder="Spotify/YouTube URL"
+                  value={songUrl}
+                  onChange={(e) => setSongUrl(e.target.value)}
+                />
+                <textarea 
+                  className="w-full p-4 border-4 border-black bg-[#fefce8] rounded-2xl font-bold h-40 outline-none resize-none flex-1"
+                  placeholder="Why should a stranger hear this?"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                />
+                <button 
+                  onClick={dropSong} 
+                  className="w-full bg-black text-white py-6 rounded-full font-black text-xl uppercase hover:bg-[#bef264] hover:text-black border-4 border-black transition-all shadow-[0px_6px_0px_0px_rgba(0,0,0,0.2)]"
+                >
+                  Give to the Ocean
+                </button>
+              </div>
             </section>
 
-            {/* RECEIVE SECTION - REVERTED TO ORIGINAL WORKING UI */}
-            <section className="border-2 border-black p-6 flex flex-col gap-4 bg-gray-50 min-h-[450px] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <h2 className="text-2xl font-black border-b-2 border-black pb-2 uppercase text-center">Hear a Stranger</h2>
+            {/* RECEIVE SECTION */}
+            <section className="border-4 border-black p-8 flex flex-col gap-6 bg-white rounded-[40px] shadow-[0px_10px_0px_0px_rgba(0,0,0,1)] min-h-[600px]">
+              <div className="flex justify-between items-center border-b-4 border-black pb-2 mb-2">
+                <h2 className="text-3xl font-black uppercase italic">Hear a Stranger</h2>
+              </div>
               
               {!discoveredSong ? (
-                <div className="flex flex-col items-center justify-center h-full py-10">
+                <div className="flex-1 flex flex-col items-center justify-center bg-[#f8fafc] border-4 border-dashed border-gray-300 rounded-[30px]">
                   <button 
                     onClick={receiveSong} 
-                    className="group flex flex-col items-center gap-4 p-10 border-2 border-dashed border-black hover:border-solid hover:bg-black hover:text-white transition-all"
+                    disabled={loading}
+                    className="group bg-white border-4 border-black p-12 rounded-full hover:bg-[#bef264] transition-all shadow-[0px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none flex flex-col items-center gap-4"
                   >
-                    <svg viewBox="0 0 24 24" width="64" height="64" stroke="currentColor" strokeWidth="1.5" fill="none" className="group-hover:animate-bounce">
-                      <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
-                    </svg>
-                    <span className="font-black tracking-widest uppercase text-sm">Pull from the Depths</span>
+                    <span className="text-6xl">{loading ? "⏳" : "🎣"}</span>
+                    <span className="font-black uppercase text-xl">{loading ? "Diving..." : "Pull from the Depths"}</span>
                   </button>
                 </div>
               ) : (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  {/* SONG PREVIEW IFRAME */}
-                  <div className="mb-4 border-2 border-black overflow-hidden bg-white">
+                <div className="flex flex-col gap-6 h-full flex-1">
+                  <div className="border-4 border-black bg-black aspect-video relative rounded-[25px] overflow-hidden shadow-[0px_6px_0px_0px_rgba(0,0,0,1)]">
                     <iframe 
                       src={getEmbedUrl(discoveredSong.url)} 
-                      width="100%" 
-                      height="152" 
-                      frameBorder="0" 
+                      className="absolute inset-0 w-full h-full"
                       allow="autoplay; encrypted-media; fullscreen" 
-                      loading="lazy"
                     ></iframe>
                   </div>
-
-                  {/* REASON BOX */}
-                  <div className="bg-black text-white p-4 mb-2">
-                    <p className="italic text-lg">"{discoveredSong.reason}"</p>
-                  </div>
                   
-                  <p className="text-xs uppercase opacity-50 mb-6 text-right">— Shared by {discoveredSong.sender}</p>
+                  <div className="bg-[#fefce8] border-4 border-black p-6 rounded-2xl font-bold text-lg italic relative">
+                    "{discoveredSong.reason}"
+                    <p className="mt-4 text-[10px] not-italic uppercase opacity-50">— Shared by {discoveredSong.sender}</p>
+                  </div>
 
-                  <button 
-                    onClick={() => setDiscoveredSong(null)} 
-                    className="w-full border-2 border-black py-3 font-black hover:bg-black hover:text-white transition-all text-xs uppercase tracking-tighter"
-                  >
-                    Throw it back / Get Another
-                  </button>
+                  {/* LARGE NEXT BUTTON AS REQUESTED */}
+                  <div className="mt-auto grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <button 
+                      onClick={() => { setDiscoveredSong(null); receiveSong(); }} 
+                      className="md:col-span-3 py-6 bg-[#bef264] border-4 border-black rounded-full font-black text-2xl uppercase hover:bg-black hover:text-[#bef264] transition-all shadow-[0px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-1"
+                    >
+                      NEXT ↻
+                    </button>
+                    <a 
+                      href={discoveredSong.url} 
+                      target="_blank" 
+                      className="md:col-span-1 bg-white border-4 border-black rounded-full p-4 flex items-center justify-center font-black text-sm hover:bg-gray-100 uppercase"
+                    >
+                      Link ↗
+                    </a>
+                  </div>
                 </div>
               )}
             </section>
